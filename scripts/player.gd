@@ -23,6 +23,9 @@ var input_mouse: Vector2
 var health:int = 100
 var gravity := 0.0
 
+var rocket_jump_ground_max_distance = 2
+var rocket_jump_weapon_knockback_clamp = 8
+
 var previously_floored := false
 
 var jump_single := true
@@ -194,7 +197,6 @@ func action_shoot():
 		
 		container.position.z += 0.25 # Knockback of weapon visual
 		camera.rotation.x += 0.025 # Knockback of camera
-		movement_velocity += Vector3(0, 0, weapon.knockback) # Knockback
 		
 		# Set muzzle flash position, play animation
 		
@@ -208,6 +210,7 @@ func action_shoot():
 		
 		# Shoot the weapon, amount based on shot count
 		
+		var average_distance: float
 		for n in weapon.shot_count:
 		
 			raycast.target_position.x = randf_range(-weapon.spread, weapon.spread)
@@ -235,6 +238,19 @@ func action_shoot():
 			
 			impact_instance.position = raycast.get_collision_point() + (raycast.get_collision_normal() / 10)
 			impact_instance.look_at(camera.global_transform.origin, Vector3.UP, true) 
+			
+			# save distance of this bullet
+			average_distance += self.position.distance_to(impact_instance.position)
+		
+		# average the combined distance
+		average_distance /= weapon.shot_count
+		
+		# apply weapon knockback to player
+		movement_velocity += camera.transform.basis.z * weapon.knockback # Knockback (now taking into account look direction)
+		
+		# rocket jump mechanic (depending on how far down they are looking and the distance to the ground)
+		if not is_on_floor() and average_distance > 0 and average_distance <= rocket_jump_ground_max_distance and camera.rotation.x < 0:
+			gravity += (weapon.knockback / rocket_jump_weapon_knockback_clamp) * camera.rotation.x
 
 # Toggle between available weapons (listed in 'weapons')
 
