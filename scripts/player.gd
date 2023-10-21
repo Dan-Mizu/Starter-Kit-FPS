@@ -18,6 +18,7 @@ signal health_updated
 @export var movement_speed: float = 5.0
 @export var jump_strength: float = 8.0
 @export var allowed_jumps: int = 2
+@export var reset_jumps_on_wall_mount: bool = false
 
 @export_subgroup("Weapons")
 @export var weapons: Array[Weapon] = []
@@ -38,6 +39,8 @@ var gravity: float = 0.0
 var previously_floored: bool = false
 var can_jump: bool = false
 var taken_jumps: int = 0
+var can_wall_run: bool = false
+var is_wall_running: bool = false
 var rocket_jump_ground_max_distance: float = 2.0
 var rocket_jump_weapon_knockback_clamp: int = 8
 
@@ -56,7 +59,31 @@ func _physics_process(delta):
 	# gravity
 	handle_gravity(delta)
 
-	# movement
+	# check if player has reached height of jump and can begin wall running
+	if can_wall_run == false and taken_jumps > 0 and gravity > 0 and not is_on_floor():
+		can_wall_run = true
+
+	# wall running
+	if can_wall_run and is_on_wall():
+		# just started to wall rung
+		if not is_wall_running:
+			# reset jumps
+			if reset_jumps_on_wall_mount:
+				taken_jumps = 0
+				can_jump = true
+
+		# prevent falling
+		gravity = 0
+
+		# push player toward wall
+		movement_velocity *= -get_wall_normal()
+		
+		# currently wall running state
+		is_wall_running = true
+	else: 
+		is_wall_running = false
+
+	# calculate and apply movement
 	var applied_velocity: Vector3
 	movement_velocity = transform.basis * movement_velocity
 	applied_velocity = velocity.lerp(movement_velocity, delta * 10)
@@ -139,6 +166,9 @@ func handle_gravity(delta):
 		# reset jump ability
 		taken_jumps = 0
 		can_jump = true
+		
+		# reset wall run ability
+		can_wall_run = false
 
 		# reset gravity
 		gravity = 0
@@ -146,6 +176,9 @@ func handle_gravity(delta):
 # jumping
 func action_jump():
 	gravity = -jump_strength
+
+	# disable wall running
+	can_wall_run = false
 
 	# record jump
 	taken_jumps += 1

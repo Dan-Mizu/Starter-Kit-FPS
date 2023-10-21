@@ -20,6 +20,7 @@ environment = ExtResource("1_fsr4x")
 
 [node name="Player" parent="." node_paths=PackedStringArray("crosshair") instance=ExtResource("2_w4sc6")]
 crosshair = NodePath("../HUD/Crosshair")
+reset_jumps_on_wall_mount = true
 
 [node name="Sun" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.422618, -0.694272, 0.582563, 0, 0.642788, 0.766044, -0.906308, 0.323744, -0.271654, 0, 0, 0)
@@ -62,6 +63,15 @@ transform = Transform3D(8.00225, 0, 0, 0, 1.00028, 0, 0, 0, 8.00225, 0.376418, 0
 
 [node name="wall-high-smooth" parent="Level" instance=ExtResource("6_u2j0f")]
 transform = Transform3D(-2.54824e-07, 0, -0.494711, 0, 3.50874, 0, 5.82969, 0, -2.16245e-08, 5.87781, 0.50014, -5.68471)
+
+[node name="wall-high-smooth3" parent="Level" instance=ExtResource("6_u2j0f")]
+transform = Transform3D(-2.54824e-07, 0, -0.494711, 0, 3.50874, 0, 5.82969, 0, -2.16245e-08, 5.87781, 6.43716, -5.68471)
+
+[node name="wall-high-smooth2" parent="Level" instance=ExtResource("6_u2j0f")]
+transform = Transform3D(-2.54824e-07, 0, -0.494711, 0, 3.50874, 0, 5.82969, 0, -2.16245e-08, 2.78057, 0.50014, -5.68471)
+
+[node name="wall-high-smooth4" parent="Level" instance=ExtResource("6_u2j0f")]
+transform = Transform3D(-2.54824e-07, 0, -0.494711, 0, 3.50874, 0, 5.82969, 0, -2.16245e-08, 2.781, 6.437, -5.685)
 
 [node name="Decoration" type="Node" parent="."]
 
