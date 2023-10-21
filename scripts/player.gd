@@ -23,8 +23,8 @@ var input_mouse: Vector2
 var health:int = 100
 var gravity := 0.0
 
-var rocket_jump_ground_max_distance = 2
-var rocket_jump_weapon_knockback_clamp = 8
+var rocket_jump_ground_max_distance: float = 2.0
+var rocket_jump_weapon_knockback_clamp: int = 8
 
 var previously_floored := false
 
@@ -210,7 +210,7 @@ func action_shoot():
 		
 		# Shoot the weapon, amount based on shot count
 		
-		var average_distance: float
+		var average_distance: float = 0
 		for n in weapon.shot_count:
 		
 			raycast.target_position.x = randf_range(-weapon.spread, weapon.spread)
@@ -250,7 +250,7 @@ func action_shoot():
 		
 		# rocket jump mechanic (depending on how far down they are looking and the distance to the ground)
 		if not is_on_floor() and average_distance > 0 and average_distance <= rocket_jump_ground_max_distance and camera.rotation.x < 0:
-			gravity += (weapon.knockback / rocket_jump_weapon_knockback_clamp) * camera.rotation.x
+			gravity += (float(weapon.knockback) / float(rocket_jump_weapon_knockback_clamp)) * camera.rotation.x
 
 # Toggle between available weapons (listed in 'weapons')
 
