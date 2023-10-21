@@ -248,7 +248,7 @@ func action_shoot():
 
 		# rocket jump mechanic (depending on how far down they are looking and the distance to the ground)
 		if not is_on_floor() and average_distance > 0 and average_distance <= rocket_jump_ground_max_distance and camera.rotation.x < 0:
-			gravity += (float(weapon.knockback) / float(rocket_jump_weapon_knockback_clamp)) * camera.rotation.x
+			gravity -= -(float(weapon.knockback) / float(rocket_jump_weapon_knockback_clamp)) * camera.rotation.x
 
 # toggle between available weapons (listed in 'weapons')
 func action_weapon_toggle():
