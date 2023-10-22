@@ -1,11 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://bwplpuhqyrurg"]
+[gd_scene load_steps=11 format=3 uid="uid://bwplpuhqyrurg"]
 
-[ext_resource type="Environment" uid="uid://jvmpkdwaeaq" path="res://scenes/main-environment.tres" id="1_fsr4x"]
+[ext_resource type="Environment" uid="uid://bmp6qx8xpbkjr" path="res://assets/materials/env.tres" id="1_kbcw7"]
 [ext_resource type="PackedScene" uid="uid://dl2ed4gkybggf" path="res://objects/player.tscn" id="2_w4sc6"]
 [ext_resource type="Script" path="res://scripts/hud.gd" id="3_85oyv"]
-[ext_resource type="PackedScene" uid="uid://dpm3l05d7fu35" path="res://objects/platform.tscn" id="3_tmyv6"]
 [ext_resource type="FontFile" uid="uid://biqtga8moh7ah" path="res://assets/fonts/lilita_one_regular.ttf" id="4_6n2mt"]
-[ext_resource type="PackedScene" uid="uid://b6tquw4xt45d3" path="res://objects/wall_high_smooth.tscn" id="6_u2j0f"]
+[ext_resource type="Material" uid="uid://dt8pbo53yu62c" path="res://assets/materials/grid.tres" id="5_vvm5l"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_1ti6h"]
 font = ExtResource("4_6n2mt")
@@ -13,19 +12,29 @@ font_size = 36
 outline_size = 12
 outline_color = Color(0, 0, 0, 0.470588)
 
+[sub_resource type="BoxMesh" id="BoxMesh_4ywr0"]
+lightmap_size_hint = Vector2i(14, 21)
+material = ExtResource("5_vvm5l")
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_nyjrt"]
+data = PackedVector3Array(-0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, -0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_kwrdy"]
+material = ExtResource("5_vvm5l")
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_l0vvu"]
+data = PackedVector3Array(-0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, -0.5)
+
 [node name="playground" type="Node3D"]
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = ExtResource("1_fsr4x")
+[node name="Environment" type="Node" parent="."]
 
-[node name="Player" parent="." node_paths=PackedStringArray("crosshair") instance=ExtResource("2_w4sc6")]
-crosshair = NodePath("../HUD/Crosshair")
-movement_speed = 10.0
-allowed_jumps = 1
-reset_jumps_on_wall_mount = true
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Environment"]
+environment = ExtResource("1_kbcw7")
 
-[node name="Sun" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.422618, -0.694272, 0.582563, 0, 0.642788, 0.766044, -0.906308, 0.323744, -0.271654, 0, 0, 0)
+[node name="Sun" type="DirectionalLight3D" parent="Environment"]
+transform = Transform3D(-0.422618, -0.694272, 0.582564, 0, 0.642788, 0.766044, -0.906308, 0.323744, -0.271654, 0, 0, 0)
+visible = false
 shadow_enabled = true
 shadow_opacity = 0.75
 
@@ -58,22 +67,32 @@ text = "100%"
 label_settings = SubResource("LabelSettings_1ti6h")
 vertical_alignment = 2
 
+[node name="Player" parent="." node_paths=PackedStringArray("crosshair") instance=ExtResource("2_w4sc6")]
+crosshair = NodePath("../HUD/Crosshair")
+movement_speed = 10.0
+allowed_jumps = 1
+reset_jumps_on_wall_mount = true
+
 [node name="Level" type="Node" parent="."]
 
-[node name="platform" parent="Level" instance=ExtResource("3_tmyv6")]
-transform = Transform3D(8.00225, 0, 0, 0, 1.00028, 0, 0, 0, 8.00225, 0.376418, 0, -5.60641)
+[node name="Ground" type="MeshInstance3D" parent="Level"]
+transform = Transform3D(21, 0, 0, 0, 1, 0, 0, 0, 21, 0, 0, -10)
+mesh = SubResource("BoxMesh_4ywr0")
+skeleton = NodePath("../..")
 
-[node name="wall-high-smooth" parent="Level" instance=ExtResource("6_u2j0f")]
-transform = Transform3D(-2.54824e-07, 0, -0.494711, 0, 3.50874, 0, 5.82969, 0, -2.16245e-08, 5.87781, 0.50014, -5.68471)
+[node name="StaticBody3D" type="StaticBody3D" parent="Level/Ground"]
 
-[node name="wall-high-smooth3" parent="Level" instance=ExtResource("6_u2j0f")]
-transform = Transform3D(-2.54824e-07, 0, -0.494711, 0, 3.50874, 0, 5.82969, 0, -2.16245e-08, 5.87781, 6.43716, -5.68471)
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Ground/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_nyjrt")
 
-[node name="wall-high-smooth2" parent="Level" instance=ExtResource("6_u2j0f")]
-transform = Transform3D(-2.54824e-07, 0, -0.494711, 0, 3.50874, 0, 5.82969, 0, -2.16245e-08, 2.78057, 0.50014, -5.68471)
+[node name="Wall" type="MeshInstance3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 12, 0, 0, 0, 15, 6, 6.5, -12)
+mesh = SubResource("BoxMesh_kwrdy")
 
-[node name="wall-high-smooth4" parent="Level" instance=ExtResource("6_u2j0f")]
-transform = Transform3D(-2.54824e-07, 0, -0.494711, 0, 3.50874, 0, 5.82969, 0, -2.16245e-08, 2.781, 6.437, -5.685)
+[node name="StaticBody3D" type="StaticBody3D" parent="Level/Wall"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Wall/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_l0vvu")
 
 [node name="Decoration" type="Node" parent="."]
 
