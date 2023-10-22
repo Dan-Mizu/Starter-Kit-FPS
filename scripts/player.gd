@@ -63,20 +63,22 @@ func _physics_process(delta):
 	if can_wall_run == false and taken_jumps > 0 and gravity > 0 and not is_on_floor():
 		can_wall_run = true
 
-	# wall running
-	if can_wall_run and is_on_wall():
+	# wall running (must be allowed to wall run, on the wall, and havent used last jump by jumping off a wall)
+	if can_wall_run and taken_jumps <= allowed_jumps and is_on_wall():
 		# just started to wall rung
 		if not is_wall_running:
+			# allow them to jump off wall
+			can_jump = true
+
 			# reset jumps
 			if reset_jumps_on_wall_mount:
 				taken_jumps = 0
-				can_jump = true
 
 		# prevent falling
 		gravity = 0
 
 		# push player toward wall
-		movement_velocity *= -get_wall_normal()
+		movement_velocity *= -get_wall_normal() + camera.transform.basis.z
 		
 		# currently wall running state
 		is_wall_running = true
@@ -175,13 +177,14 @@ func handle_gravity(delta):
 
 # jumping
 func action_jump():
-	gravity = -jump_strength
-
 	# disable wall running
 	can_wall_run = false
 
 	# record jump
 	taken_jumps += 1
+
+	# apply jump to gravity
+	gravity = -jump_strength
 
 	# check if at max jumps
 	if taken_jumps >= allowed_jumps:

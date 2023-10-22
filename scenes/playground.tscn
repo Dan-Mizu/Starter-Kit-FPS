@@ -20,6 +20,7 @@ environment = ExtResource("1_fsr4x")
 
 [node name="Player" parent="." node_paths=PackedStringArray("crosshair") instance=ExtResource("2_w4sc6")]
 crosshair = NodePath("../HUD/Crosshair")
+allowed_jumps = 1
 reset_jumps_on_wall_mount = true
 
 [node name="Sun" type="DirectionalLight3D" parent="."]
