@@ -2,6 +2,11 @@ extends Node3D
 
 @export var player: Node3D
 
+@export_subgroup("Sound Effects")
+@export var attack_sfx: AudioStream
+@export var destroy_sfx: AudioStream
+@export var hurt_sfx: AudioStream
+
 @onready var raycast = $RayCast
 @onready var muzzle_a = $MuzzleA
 @onready var muzzle_b = $MuzzleB
@@ -28,7 +33,7 @@ func _process(delta):
 # Take damage from player
 
 func damage(amount):
-	Audio.play("sounds/enemy_hurt.ogg")
+	Audio.play(hurt_sfx)
 
 	health -= amount
 
@@ -38,7 +43,7 @@ func damage(amount):
 # Destroy the enemy when out of health
 
 func destroy():
-	Audio.play("sounds/enemy_destroy.ogg")
+	Audio.play(destroy_sfx)
 
 	destroyed = true
 	queue_free()
@@ -63,6 +68,6 @@ func _on_timer_timeout():
 			muzzle_b.play("default")
 			muzzle_b.rotation_degrees.z = randf_range(-45, 45)
 
-			Audio.play("sounds/enemy_attack.ogg")
+			Audio.play(attack_sfx)
 
 			collider.damage(5)  # Apply damage to player

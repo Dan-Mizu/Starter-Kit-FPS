@@ -1,11 +1,27 @@
-[gd_scene load_steps=8 format=3 uid="uid://dl2ed4gkybggf"]
+[gd_scene load_steps=14 format=3 uid="uid://dl2ed4gkybggf"]
 
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_iq1au"]
-[ext_resource type="Resource" uid="uid://cu2gtxlcmbb34" path="res://weapons/blaster-repeater.tres" id="2_6epbw"]
-[ext_resource type="Texture2D" uid="uid://8ggihh27mlrr" path="res://sprites/blob_shadow.png" id="2_b0fo8"]
-[ext_resource type="Resource" uid="uid://c56y8pqoyk15f" path="res://weapons/blaster.tres" id="3_kr4p8"]
-[ext_resource type="SpriteFrames" uid="uid://dbv3sy5qjatnl" path="res://sprites/burst_animation.tres" id="4_m6ukc"]
-[ext_resource type="AudioStream" uid="uid://cydjn1ct3hps2" path="res://sounds/walking.ogg" id="5_ics1s"]
+[ext_resource type="Resource" uid="uid://cu2gtxlcmbb34" path="res://objects/weapons/blaster-repeater.tres" id="2_6epbw"]
+[ext_resource type="Texture2D" uid="uid://8ggihh27mlrr" path="res://assets/sprites/blob_shadow.png" id="2_b0fo8"]
+[ext_resource type="Resource" uid="uid://c56y8pqoyk15f" path="res://objects/weapons/blaster.tres" id="3_kr4p8"]
+[ext_resource type="AudioStream" uid="uid://xnxidwkp46un" path="res://assets/sounds/land.ogg" id="4_lblce"]
+[ext_resource type="SpriteFrames" uid="uid://dbv3sy5qjatnl" path="res://assets/sprites/burst_animation.tres" id="4_m6ukc"]
+[ext_resource type="AudioStream" uid="uid://cydjn1ct3hps2" path="res://assets/sounds/walking.ogg" id="5_ics1s"]
+[ext_resource type="AudioStream" uid="uid://bvnum0u73y8sv" path="res://assets/sounds/jump_a.ogg" id="5_sx2ws"]
+[ext_resource type="AudioStream" uid="uid://5raj3p7xaecq" path="res://assets/sounds/jump_b.ogg" id="6_7xwn8"]
+[ext_resource type="AudioStream" uid="uid://7tnsakv8pwa5" path="res://assets/sounds/jump_c.ogg" id="7_8js3r"]
+[ext_resource type="AudioStream" uid="uid://cmc2ufr6o30gl" path="res://assets/sounds/weapon_change.ogg" id="8_0yaao"]
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_sbk2y"]
+streams_count = 3
+random_pitch = 1.0
+random_volume_offset_db = 0.0
+stream_0/stream = ExtResource("5_sx2ws")
+stream_0/weight = 1.0
+stream_1/stream = ExtResource("6_7xwn8")
+stream_1/weight = 1.0
+stream_2/stream = ExtResource("7_8js3r")
+stream_2/weight = 1.0
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_gdq8c"]
 radius = 0.3
@@ -15,6 +31,9 @@ height = 1.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 script = ExtResource("1_iq1au")
 weapons = Array[Resource("res://scripts/weapon.gd")]([ExtResource("3_kr4p8"), ExtResource("2_6epbw")])
+land_sfx = ExtResource("4_lblce")
+jump_sfx = SubResource("AudioStreamRandomizer_sbk2y")
+weapon_change_sfx = ExtResource("8_0yaao")
 
 [node name="Collider" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)

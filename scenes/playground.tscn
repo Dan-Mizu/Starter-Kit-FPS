@@ -4,11 +4,11 @@
 [ext_resource type="PackedScene" uid="uid://dl2ed4gkybggf" path="res://objects/player.tscn" id="2_w4sc6"]
 [ext_resource type="Script" path="res://scripts/hud.gd" id="3_85oyv"]
 [ext_resource type="PackedScene" uid="uid://dpm3l05d7fu35" path="res://objects/platform.tscn" id="3_tmyv6"]
-[ext_resource type="FontFile" uid="uid://biqtga8moh7ah" path="res://fonts/lilita_one_regular.ttf" id="4_cdwfr"]
+[ext_resource type="FontFile" uid="uid://biqtga8moh7ah" path="res://assets/fonts/lilita_one_regular.ttf" id="4_6n2mt"]
 [ext_resource type="PackedScene" uid="uid://b6tquw4xt45d3" path="res://objects/wall_high_smooth.tscn" id="6_u2j0f"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_1ti6h"]
-font = ExtResource("4_cdwfr")
+font = ExtResource("4_6n2mt")
 font_size = 36
 outline_size = 12
 outline_color = Color(0, 0, 0, 0.470588)
@@ -20,6 +20,7 @@ environment = ExtResource("1_fsr4x")
 
 [node name="Player" parent="." node_paths=PackedStringArray("crosshair") instance=ExtResource("2_w4sc6")]
 crosshair = NodePath("../HUD/Crosshair")
+movement_speed = 10.0
 allowed_jumps = 1
 reset_jumps_on_wall_mount = true
 

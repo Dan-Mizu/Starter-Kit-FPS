@@ -6,6 +6,7 @@ class_name Weapon
 @export var position: Vector3  # On-screen position
 @export var rotation: Vector3  # On-screen rotation
 @export var muzzle_position: Vector3  # On-screen position of muzzle flash
+@export var impact: PackedScene # Impact object
 
 @export_subgroup("Properties")
 @export_range(0.1, 1) var cooldown: float = 0.1  # Firerate
@@ -16,7 +17,7 @@ class_name Weapon
 @export_range(0, 50) var knockback: int = 20  # Amount of knockback
 
 @export_subgroup("Sounds")
-@export var sound_shoot: String  # Sound path
+@export var sound_shoot: AudioStream
 
 @export_subgroup("Crosshair")
 @export var crosshair: Texture2D  # Image of crosshair on-screen

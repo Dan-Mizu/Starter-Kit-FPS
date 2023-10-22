@@ -23,6 +23,11 @@ signal health_updated
 @export_subgroup("Weapons")
 @export var weapons: Array[Weapon] = []
 
+@export_subgroup("Sound Effects")
+@export var land_sfx: AudioStream
+@export var jump_sfx: AudioStreamRandomizer
+@export var weapon_change_sfx: AudioStream
+
 # internal properties
 var weapon: Weapon
 var weapon_index: int = 0
@@ -110,7 +115,7 @@ func _physics_process(delta):
 
 	# landed
 	if is_on_floor() and gravity > 1 and !previously_floored:
-		Audio.play("sounds/land.ogg")
+		Audio.play(land_sfx)
 		camera.position.y = -0.1
 
 	# store landed state for next pass
@@ -153,7 +158,7 @@ func handle_controls(_delta):
 
 	# jumping
 	if Input.is_action_just_pressed("jump") and can_jump:
-		Audio.play("sounds/jump_a.ogg, sounds/jump_b.ogg, sounds/jump_c.ogg")
+		Audio.play(jump_sfx)
 		action_jump()
 
 	# weapon switching
@@ -233,8 +238,7 @@ func action_shoot():
 				collider.damage(weapon.damage)
 
 			# creating an impact animation
-			var impact = preload("res://objects/impact.tscn")
-			var impact_instance = impact.instantiate()
+			var impact_instance = weapon.impact.instantiate()
 			impact_instance.play("shot")
 			get_tree().root.add_child(impact_instance)
 			impact_instance.position = raycast.get_collision_point() + (raycast.get_collision_normal() / 10)
@@ -260,7 +264,7 @@ func action_weapon_toggle():
 		initiate_change_weapon(weapon_index)
 
 		# audio cue
-		Audio.play("sounds/weapon_change.ogg")
+		Audio.play(weapon_change_sfx)
 
 # initiates the weapon changing animation (tween)
 func initiate_change_weapon(index):

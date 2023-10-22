@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="Weapon" load_steps=6 format=3 uid="uid://cu2gtxlcmbb34"]
+
+[ext_resource type="Texture2D" uid="uid://ce3lgq7foiusl" path="res://assets/sprites/crosshair-repeater.png" id="1_04s8i"]
+[ext_resource type="Script" path="res://scripts/weapon.gd" id="1_l1atd"]
+[ext_resource type="PackedScene" uid="uid://b7070gfoko4mo" path="res://objects/impact.tscn" id="2_68ty4"]
+[ext_resource type="PackedScene" uid="uid://dd3oln1ucgqpd" path="res://assets/models/blaster-repeater.glb" id="2_j2mwo"]
+[ext_resource type="AudioStream" uid="uid://csdsvg0nh35id" path="res://assets/sounds/blaster_repeater.ogg" id="4_xvcdi"]
+
+[resource]
+script = ExtResource("1_l1atd")
+model = ExtResource("2_j2mwo")
+position = Vector3(0, 0, 0)
+rotation = Vector3(0, 180, 0)
+muzzle_position = Vector3(0.1, -0.4, 1.5)
+impact = ExtResource("2_68ty4")
+cooldown = 0.1
+max_distance = 10
+damage = 10.0
+spread = 0.5
+shot_count = 1
+knockback = 10
+sound_shoot = ExtResource("4_xvcdi")
+crosshair = ExtResource("1_04s8i")

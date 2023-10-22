@@ -1,14 +1,20 @@
-[gd_scene load_steps=5 format=3 uid="uid://d2g78tpqbyf5g"]
+[gd_scene load_steps=8 format=3 uid="uid://d2g78tpqbyf5g"]
 
-[ext_resource type="PackedScene" uid="uid://lde2xq3vq635" path="res://models/enemy-flying.glb" id="1_3v8nl"]
+[ext_resource type="PackedScene" uid="uid://lde2xq3vq635" path="res://assets/models/enemy-flying.glb" id="1_3v8nl"]
 [ext_resource type="Script" path="res://scripts/enemy.gd" id="1_8glc4"]
-[ext_resource type="SpriteFrames" uid="uid://dbv3sy5qjatnl" path="res://sprites/burst_animation.tres" id="3_iblw5"]
+[ext_resource type="AudioStream" uid="uid://cgnbyrnxj12ed" path="res://assets/sounds/enemy_hurt.ogg" id="2_eqccw"]
+[ext_resource type="AudioStream" uid="uid://blxqudiclpq84" path="res://assets/sounds/enemy_attack.ogg" id="2_ff4ee"]
+[ext_resource type="AudioStream" uid="uid://br1ov3ld0er6r" path="res://assets/sounds/enemy_destroy.ogg" id="2_sqt4w"]
+[ext_resource type="SpriteFrames" uid="uid://dbv3sy5qjatnl" path="res://assets/sprites/burst_animation.tres" id="3_iblw5"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_iix87"]
 radius = 0.75
 
 [node name="enemy-flying" type="Area3D"]
 script = ExtResource("1_8glc4")
+attack_sfx = ExtResource("2_ff4ee")
+destroy_sfx = ExtResource("2_sqt4w")
+hurt_sfx = ExtResource("2_eqccw")
 
 [node name="enemy-flying" parent="." instance=ExtResource("1_3v8nl")]
 
