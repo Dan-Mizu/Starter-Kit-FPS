@@ -46,6 +46,7 @@ var can_jump: bool = false
 var taken_jumps: int = 0
 var can_wall_run: bool = false
 var is_wall_running: bool = false
+var wall_run_direction: int = 0
 var rocket_jump_ground_max_distance: float = 2.0
 var rocket_jump_weapon_knockback_clamp: int = 8
 
@@ -64,6 +65,10 @@ func _physics_process(delta):
 	# gravity
 	handle_gravity(delta)
 
+	# calculate movement
+	var applied_velocity: Vector3
+	movement_velocity = transform.basis * movement_velocity
+
 	# check if player has reached height of jump and can begin wall running
 	if can_wall_run == false and taken_jumps > 0 and gravity > 0 and not is_on_floor():
 		can_wall_run = true
@@ -79,34 +84,62 @@ func _physics_process(delta):
 			if reset_jumps_on_wall_mount:
 				taken_jumps = 0
 
+			# get direction of mount/wallrun
+			var look_direction_vector = -global_transform.basis.z
+			var wall_vectors = [get_wall_normal().dot(look_direction_vector), get_wall_normal().rotated(Vector3.UP, rad_to_deg(90)).dot(look_direction_vector), (-get_wall_normal()).dot(look_direction_vector), get_wall_normal().rotated(Vector3.UP, rad_to_deg(-90)).dot(look_direction_vector)]
+			var smallest_vector
+			for i in wall_vectors.size():
+				if smallest_vector == null:
+					smallest_vector = i
+				else:
+					if wall_vectors[i] < wall_vectors[smallest_vector]:
+						smallest_vector = i
+			if smallest_vector == 1:
+				wall_run_direction = -1
+			elif smallest_vector == 3:
+				wall_run_direction = 1
+			else:
+				wall_run_direction = 0
+
+			# DEBUG
+			#const wall_vector_names = ["normal", "perpendicular", "normal reversed", "perpendicular reversed"]
+			#print(wall_vector_names[smallest_vector])
+
 		# prevent falling
 		gravity = 0
 
-		# push player toward wall
-		movement_velocity *= -get_wall_normal() + camera.transform.basis.z
-		
+		# push player toward wall, and push forward perpendicular to wall's normal vector depending on player's initial look direction
+		if wall_run_direction == 0:
+			movement_velocity = -get_wall_normal()
+		else:
+			movement_velocity = -get_wall_normal() + get_wall_normal().rotated(Vector3.UP, rad_to_deg(90 * wall_run_direction)) * movement_speed
+
 		# currently wall running state
 		is_wall_running = true
 	else: 
 		is_wall_running = false
+		wall_run_direction = 0
 
-	# calculate and apply movement
-	var applied_velocity: Vector3
-	movement_velocity = transform.basis * movement_velocity
+	# apply movement
 	applied_velocity = velocity.lerp(movement_velocity, delta * 10)
 	applied_velocity.y = -gravity
 	velocity = applied_velocity
 	move_and_slide()
 
 	# rotation
-	camera.rotation.z = lerp_angle(camera.rotation.z, -input_mouse.x * 25 * delta, delta * 5)
+	if is_wall_running:
+		# rotate angle slightly if wall running
+		camera.rotation.z = lerp_angle(camera.rotation.z, deg_to_rad(10 * wall_run_direction), delta * 5)
+	else:
+		# slightly tilt camera and lag behind mouse input for dramatic effect
+		camera.rotation.z = lerp_angle(camera.rotation.z, -input_mouse.x * 25 * delta, delta * 5)
 	camera.rotation.x = lerp_angle(camera.rotation.x, rotation_target.x, delta * 25)
 	rotation.y = lerp_angle(rotation.y, rotation_target.y, delta * 25)
 	container.position = lerp(container.position, container_offset - (basis.inverse() * applied_velocity / 30), delta * 10)
 
 	# movement sound
 	sound_footsteps.stream_paused = true
-	if is_on_floor():
+	if is_on_floor() or is_wall_running:
 		if abs(velocity.x) > 1 or abs(velocity.z) > 1:
 			sound_footsteps.stream_paused = false
 
