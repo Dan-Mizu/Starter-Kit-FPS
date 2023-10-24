@@ -71,7 +71,7 @@ func _physics_process(delta):
 	movement_velocity = transform.basis * movement_velocity
 
 	# check if player has reached height of jump and can begin wall running
-	if can_wall_run == false and taken_jumps > 0 and gravity > 0 and not is_on_floor():
+	if can_wall_run == false and gravity > 0 and not is_on_floor():
 		can_wall_run = true
 
 	# wall running (must be allowed to wall run, on the wall, and havent used last jump by jumping off a wall)
@@ -215,7 +215,7 @@ func handle_controls(_delta):
 	action_shoot()
 
 	# jumping
-	if Input.is_action_just_pressed("jump") and can_jump:
+	if Input.is_action_pressed("jump") and can_jump:
 		Audio.play(jump_sfx)
 		action_jump()
 
@@ -231,12 +231,16 @@ func handle_gravity(delta):
 		# reset jump ability
 		taken_jumps = 0
 		can_jump = true
-		
+
 		# reset wall run ability
 		can_wall_run = false
 
 		# reset gravity
 		gravity = 0
+
+	# prevent first jump if falling
+	if taken_jumps == 0 and not is_on_floor() and not is_wall_running:
+		can_jump = false
 
 # jumping
 func action_jump():
