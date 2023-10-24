@@ -76,7 +76,7 @@ reset_jumps_on_wall_mount = true
 [node name="Level" type="Node" parent="."]
 
 [node name="Ground" type="MeshInstance3D" parent="Level"]
-transform = Transform3D(21, 0, 0, 0, 1, 0, 0, 0, 21, 0, 0, -10)
+transform = Transform3D(21, 0, 0, 0, 1, 0, 0, 0, 188.691, 0, 0, 75.9634)
 mesh = SubResource("BoxMesh_4ywr0")
 skeleton = NodePath("../..")
 
@@ -92,6 +92,78 @@ mesh = SubResource("BoxMesh_kwrdy")
 [node name="StaticBody3D" type="StaticBody3D" parent="Level/Wall"]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Wall/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_dqdk4")
+
+[node name="Wall2" type="MeshInstance3D" parent="Level"]
+transform = Transform3D(0.929725, 0, -4.41905, 0, 12, 0, 0.368254, 0, 11.1567, 2.3718, 6.5, 7.44884)
+mesh = SubResource("BoxMesh_kwrdy")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Level/Wall2"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Wall2/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_dqdk4")
+
+[node name="Wall3" type="MeshInstance3D" parent="Level"]
+transform = Transform3D(0.925699, 0, 4.53913, 0, 12, 0, -0.378261, 0, 11.1084, -2.73413, 6.5, 17.7296)
+mesh = SubResource("BoxMesh_kwrdy")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Level/Wall3"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Wall3/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_dqdk4")
+
+[node name="Wall4" type="MeshInstance3D" parent="Level"]
+transform = Transform3D(0.929725, 0, -4.41905, 0, 12, 0, 0.368254, 0, 11.1567, 1.48151, 6.5, 27.4324)
+mesh = SubResource("BoxMesh_kwrdy")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Level/Wall4"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Wall4/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_dqdk4")
+
+[node name="Wall5" type="MeshInstance3D" parent="Level"]
+transform = Transform3D(0.925699, 0, 4.53913, 0, 12, 0, -0.378261, 0, 11.1084, -2.73413, 6.5, 37.2858)
+mesh = SubResource("BoxMesh_kwrdy")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Level/Wall5"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Wall5/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_dqdk4")
+
+[node name="Wall6" type="MeshInstance3D" parent="Level"]
+transform = Transform3D(0.929725, 0, -4.41905, 0, 12, 0, 0.368254, 0, 11.1567, 2.3718, 6.5, 48.1754)
+mesh = SubResource("BoxMesh_kwrdy")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Level/Wall6"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Wall6/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_dqdk4")
+
+[node name="Wall7" type="MeshInstance3D" parent="Level"]
+transform = Transform3D(0.925699, 0, 4.53913, 0, 12, 0, -0.378261, 0, 11.1084, -2.73413, 6.5, 58.4561)
+mesh = SubResource("BoxMesh_kwrdy")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Level/Wall7"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Wall7/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_dqdk4")
+
+[node name="Wall8" type="MeshInstance3D" parent="Level"]
+transform = Transform3D(0.929725, 0, -4.41905, 0, 12, 0, 0.368254, 0, 11.1567, 1.48151, 6.5, 68.159)
+mesh = SubResource("BoxMesh_kwrdy")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Level/Wall8"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Wall8/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_dqdk4")
+
+[node name="Wall9" type="MeshInstance3D" parent="Level"]
+transform = Transform3D(0.925699, 0, 4.53913, 0, 12, 0, -0.378261, 0, 11.1084, -2.73413, 6.5, 78.0124)
+mesh = SubResource("BoxMesh_kwrdy")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Level/Wall9"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Wall9/StaticBody3D"]
 shape = SubResource("ConcavePolygonShape3D_dqdk4")
 
 [node name="Decoration" type="Node" parent="."]
