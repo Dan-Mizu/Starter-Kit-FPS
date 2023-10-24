@@ -47,6 +47,7 @@ var taken_jumps: int = 0
 var can_wall_run: bool = false
 var is_wall_running: bool = false
 var wall_run_direction: int = 0
+var wall_run_rotation: float
 var rocket_jump_ground_max_distance: float = 2.0
 var rocket_jump_weapon_knockback_clamp: int = 8
 
@@ -75,7 +76,10 @@ func _physics_process(delta):
 
 	# wall running (must be allowed to wall run, on the wall, and havent used last jump by jumping off a wall)
 	if can_wall_run and taken_jumps <= allowed_jumps and is_on_wall():
-		# just started to wall rung
+		# get wall vector
+		var wall_vectors: Array[Vector3] = [get_wall_normal()]
+
+		# just started to wall run
 		if not is_wall_running:
 			# allow them to jump off wall
 			can_jump = true
@@ -84,35 +88,53 @@ func _physics_process(delta):
 			if reset_jumps_on_wall_mount:
 				taken_jumps = 0
 
-			# get direction of mount/wallrun
-			var look_direction_vector = -global_transform.basis.z
-			var wall_vectors = [get_wall_normal().dot(look_direction_vector), get_wall_normal().rotated(Vector3.UP, rad_to_deg(90)).dot(look_direction_vector), (-get_wall_normal()).dot(look_direction_vector), get_wall_normal().rotated(Vector3.UP, rad_to_deg(-90)).dot(look_direction_vector)]
-			var smallest_vector
+			# get look direction vector
+			var look_direction_vector: Vector3 = -global_transform.basis.z
+
+			# get remaining wall vectors
+			wall_vectors.push_back(wall_vectors[0].rotated(Vector3.UP, -PI/2))
+			wall_vectors.push_back(-wall_vectors[0])
+			wall_vectors.push_back(-wall_vectors[1])
+
+			# get dot product of look direction and wall vectors
+			var wall_vector_dot_products: Array[float] = []
 			for i in wall_vectors.size():
+				wall_vector_dot_products.push_back(wall_vectors[i].dot(look_direction_vector))
+
+			# find closest wall vector to look direction vector
+			var smallest_vector: int
+			for i in wall_vector_dot_products.size():
 				if smallest_vector == null:
 					smallest_vector = i
 				else:
-					if wall_vectors[i] < wall_vectors[smallest_vector]:
+					if wall_vector_dot_products[i] < wall_vector_dot_products[smallest_vector]:
 						smallest_vector = i
+
+			# determine direction of wall run
 			if smallest_vector == 1:
-				wall_run_direction = -1
-			elif smallest_vector == 3:
 				wall_run_direction = 1
+			elif smallest_vector == 3:
+				wall_run_direction = -1
 			else:
 				wall_run_direction = 0
 
-			# DEBUG
-			#const wall_vector_names = ["normal", "perpendicular", "normal reversed", "perpendicular reversed"]
-			#print(wall_vector_names[smallest_vector])
+			# get angle of wall parallel to player with same direction
+			wall_run_rotation = Vector2(wall_vectors[smallest_vector].z, wall_vectors[smallest_vector].x).angle()
+
+			# keep rotation target within bounds
+			if rotation_target.y + TAU > ((wall_run_rotation + PI/2) + TAU):
+				rotation_target.y -= TAU
+			elif rotation_target.y + TAU < ((wall_run_rotation - PI/2) + TAU):
+				rotation_target.y += TAU
 
 		# prevent falling
 		gravity = 0
 
 		# push player toward wall, and push forward perpendicular to wall's normal vector depending on player's initial look direction
 		if wall_run_direction == 0:
-			movement_velocity = -get_wall_normal()
+			movement_velocity = -wall_vectors[0]
 		else:
-			movement_velocity = -get_wall_normal() + get_wall_normal().rotated(Vector3.UP, rad_to_deg(90 * wall_run_direction)) * movement_speed
+			movement_velocity = -wall_vectors[0] + wall_vectors[0].rotated(Vector3.UP, wall_run_direction * (PI/2)) * movement_speed
 
 		# currently wall running state
 		is_wall_running = true
@@ -129,12 +151,15 @@ func _physics_process(delta):
 	# rotation
 	if is_wall_running:
 		# rotate angle slightly if wall running
-		camera.rotation.z = lerp_angle(camera.rotation.z, deg_to_rad(10 * wall_run_direction), delta * 5)
+		camera.rotation.z = lerp_angle(camera.rotation.z, deg_to_rad(-10 * wall_run_direction), delta * 5)
+
+		# clamp y rotation of camera
+		rotation_target.y = clamp(rotation_target.y + TAU, (wall_run_rotation - PI/2) + TAU, (wall_run_rotation + PI/2) + TAU) - TAU
 	else:
 		# slightly tilt camera and lag behind mouse input for dramatic effect
 		camera.rotation.z = lerp_angle(camera.rotation.z, -input_mouse.x * 25 * delta, delta * 5)
-	camera.rotation.x = lerp_angle(camera.rotation.x, rotation_target.x, delta * 25)
 	rotation.y = lerp_angle(rotation.y, rotation_target.y, delta * 25)
+	camera.rotation.x = lerp_angle(camera.rotation.x, rotation_target.x, delta * 25)	
 	container.position = lerp(container.position, container_offset - (basis.inverse() * applied_velocity / 30), delta * 10)
 
 	# movement sound
