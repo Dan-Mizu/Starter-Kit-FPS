@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://bwplpuhqyrurg"]
+[gd_scene load_steps=7 format=3 uid="uid://bwplpuhqyrurg"]
 
 [ext_resource type="Environment" uid="uid://bmp6qx8xpbkjr" path="res://assets/materials/env.tres" id="1_kbcw7"]
 [ext_resource type="PackedScene" uid="uid://dl2ed4gkybggf" path="res://objects/player.tscn" id="2_w4sc6"]
@@ -11,19 +11,6 @@ font = ExtResource("4_6n2mt")
 font_size = 36
 outline_size = 12
 outline_color = Color(0, 0, 0, 0.470588)
-
-[sub_resource type="BoxMesh" id="BoxMesh_4ywr0"]
-lightmap_size_hint = Vector2i(14, 21)
-material = ExtResource("5_vvm5l")
-
-[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_nyjrt"]
-data = PackedVector3Array(-0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, -0.5)
-
-[sub_resource type="BoxMesh" id="BoxMesh_kwrdy"]
-material = ExtResource("5_vvm5l")
-
-[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_dqdk4"]
-data = PackedVector3Array(-0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, -0.5)
 
 [node name="playground" type="Node3D"]
 
@@ -75,96 +62,65 @@ reset_jumps_on_wall_mount = true
 
 [node name="Level" type="Node" parent="."]
 
-[node name="Ground" type="MeshInstance3D" parent="Level"]
-transform = Transform3D(21, 0, 0, 0, 1, 0, 0, 0, 188.691, 0, 0, 75.9634)
-mesh = SubResource("BoxMesh_4ywr0")
-skeleton = NodePath("../..")
+[node name="Ground" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 32.5825)
+use_collision = true
+size = Vector3(21, 1, 110.025)
+material = ExtResource("5_vvm5l")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="Level/Ground"]
+[node name="Building" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.5, -10)
+use_collision = true
+size = Vector3(12, 12, 12)
+material = ExtResource("5_vvm5l")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Ground/StaticBody3D"]
-shape = SubResource("ConcavePolygonShape3D_nyjrt")
+[node name="Wall" type="CSGBox3D" parent="Level"]
+transform = Transform3D(0.929776, 0, -0.368125, 0, 1, 0, 0.368125, 0, 0.929776, 2.372, 6.5, 7.449)
+use_collision = true
+size = Vector3(1, 12, 12)
+material = ExtResource("5_vvm5l")
 
-[node name="Wall" type="MeshInstance3D" parent="Level"]
-transform = Transform3D(12, 0, 0, 0, 12, 0, 0, 0, 12, 0, 6.5, -10)
-mesh = SubResource("BoxMesh_kwrdy")
+[node name="Wall2" type="CSGBox3D" parent="Level"]
+transform = Transform3D(0.92587, 0, 0.377841, 0, 1, 0, -0.377841, 0, 0.92587, -2.734, 6.5, 17.73)
+use_collision = true
+size = Vector3(1, 12, 12)
+material = ExtResource("5_vvm5l")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="Level/Wall"]
+[node name="Wall3" type="CSGBox3D" parent="Level"]
+transform = Transform3D(0.929776, 0, -0.368124, 0, 1, 0, 0.368124, 0, 0.929776, 1.482, 6.5, 27.432)
+use_collision = true
+size = Vector3(1, 12, 12)
+material = ExtResource("5_vvm5l")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Wall/StaticBody3D"]
-shape = SubResource("ConcavePolygonShape3D_dqdk4")
+[node name="Wall4" type="CSGBox3D" parent="Level"]
+transform = Transform3D(0.92587, 0, 0.377841, 0, 1, 0, -0.377841, 0, 0.92587, -2.734, 6.5, 37.286)
+use_collision = true
+size = Vector3(1, 12, 12)
+material = ExtResource("5_vvm5l")
 
-[node name="Wall2" type="MeshInstance3D" parent="Level"]
-transform = Transform3D(0.929725, 0, -4.41905, 0, 12, 0, 0.368254, 0, 11.1567, 2.3718, 6.5, 7.44884)
-mesh = SubResource("BoxMesh_kwrdy")
+[node name="Wall5" type="CSGBox3D" parent="Level"]
+transform = Transform3D(0.929776, 0, -0.368124, 0, 1, 0, 0.368124, 0, 0.929776, 2.372, 6.5, 48.175)
+use_collision = true
+size = Vector3(1, 12, 12)
+material = ExtResource("5_vvm5l")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="Level/Wall2"]
+[node name="Wall6" type="CSGBox3D" parent="Level"]
+transform = Transform3D(0.92587, 0, 0.377841, 0, 1, 0, -0.377841, 0, 0.92587, -2.734, 6.5, 58.456)
+use_collision = true
+size = Vector3(1, 12, 12)
+material = ExtResource("5_vvm5l")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Wall2/StaticBody3D"]
-shape = SubResource("ConcavePolygonShape3D_dqdk4")
+[node name="Wall7" type="CSGBox3D" parent="Level"]
+transform = Transform3D(0.929776, 0, -0.368124, 0, 1, 0, 0.368124, 0, 0.929776, 1.482, 6.5, 68.159)
+use_collision = true
+size = Vector3(1, 12, 12)
+material = ExtResource("5_vvm5l")
 
-[node name="Wall3" type="MeshInstance3D" parent="Level"]
-transform = Transform3D(0.925699, 0, 4.53913, 0, 12, 0, -0.378261, 0, 11.1084, -2.73413, 6.5, 17.7296)
-mesh = SubResource("BoxMesh_kwrdy")
-
-[node name="StaticBody3D" type="StaticBody3D" parent="Level/Wall3"]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Wall3/StaticBody3D"]
-shape = SubResource("ConcavePolygonShape3D_dqdk4")
-
-[node name="Wall4" type="MeshInstance3D" parent="Level"]
-transform = Transform3D(0.929725, 0, -4.41905, 0, 12, 0, 0.368254, 0, 11.1567, 1.48151, 6.5, 27.4324)
-mesh = SubResource("BoxMesh_kwrdy")
-
-[node name="StaticBody3D" type="StaticBody3D" parent="Level/Wall4"]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Wall4/StaticBody3D"]
-shape = SubResource("ConcavePolygonShape3D_dqdk4")
-
-[node name="Wall5" type="MeshInstance3D" parent="Level"]
-transform = Transform3D(0.925699, 0, 4.53913, 0, 12, 0, -0.378261, 0, 11.1084, -2.73413, 6.5, 37.2858)
-mesh = SubResource("BoxMesh_kwrdy")
-
-[node name="StaticBody3D" type="StaticBody3D" parent="Level/Wall5"]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Wall5/StaticBody3D"]
-shape = SubResource("ConcavePolygonShape3D_dqdk4")
-
-[node name="Wall6" type="MeshInstance3D" parent="Level"]
-transform = Transform3D(0.929725, 0, -4.41905, 0, 12, 0, 0.368254, 0, 11.1567, 2.3718, 6.5, 48.1754)
-mesh = SubResource("BoxMesh_kwrdy")
-
-[node name="StaticBody3D" type="StaticBody3D" parent="Level/Wall6"]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Wall6/StaticBody3D"]
-shape = SubResource("ConcavePolygonShape3D_dqdk4")
-
-[node name="Wall7" type="MeshInstance3D" parent="Level"]
-transform = Transform3D(0.925699, 0, 4.53913, 0, 12, 0, -0.378261, 0, 11.1084, -2.73413, 6.5, 58.4561)
-mesh = SubResource("BoxMesh_kwrdy")
-
-[node name="StaticBody3D" type="StaticBody3D" parent="Level/Wall7"]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Wall7/StaticBody3D"]
-shape = SubResource("ConcavePolygonShape3D_dqdk4")
-
-[node name="Wall8" type="MeshInstance3D" parent="Level"]
-transform = Transform3D(0.929725, 0, -4.41905, 0, 12, 0, 0.368254, 0, 11.1567, 1.48151, 6.5, 68.159)
-mesh = SubResource("BoxMesh_kwrdy")
-
-[node name="StaticBody3D" type="StaticBody3D" parent="Level/Wall8"]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Wall8/StaticBody3D"]
-shape = SubResource("ConcavePolygonShape3D_dqdk4")
-
-[node name="Wall9" type="MeshInstance3D" parent="Level"]
-transform = Transform3D(0.925699, 0, 4.53913, 0, 12, 0, -0.378261, 0, 11.1084, -2.73413, 6.5, 78.0124)
-mesh = SubResource("BoxMesh_kwrdy")
-
-[node name="StaticBody3D" type="StaticBody3D" parent="Level/Wall9"]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Wall9/StaticBody3D"]
-shape = SubResource("ConcavePolygonShape3D_dqdk4")
+[node name="Wall8" type="CSGBox3D" parent="Level"]
+transform = Transform3D(0.92587, 0, 0.377841, 0, 1, 0, -0.377841, 0, 0.92587, -2.734, 6.5, 78.012)
+use_collision = true
+size = Vector3(1, 12, 12)
+material = ExtResource("5_vvm5l")
 
 [node name="Decoration" type="Node" parent="."]
 
