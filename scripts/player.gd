@@ -15,10 +15,10 @@ signal health_updated
 @export var crosshair: TextureRect
 
 @export_subgroup("Properties")
-@export var movement_speed: float = 5.0
+@export var base_speed: float = 10.0
 @export var jump_strength: float = 8.0
-@export var allowed_jumps: int = 2
-@export var reset_jumps_on_wall_mount: bool = false
+@export var max_jumps: int = 1
+@export var reset_jumps_on_wall_mount: bool = true
 
 @export_subgroup("Weapons")
 @export var weapons: Array[Weapon] = []
@@ -29,6 +29,7 @@ signal health_updated
 @export var weapon_change_sfx: AudioStream
 
 # internal properties
+var movement_speed: float = 0.0
 var weapon: Weapon
 var weapon_index: int = 0
 var mouse_sensitivity: int = 700
@@ -75,7 +76,7 @@ func _physics_process(delta):
 		can_wall_run = true
 
 	# wall running (must be allowed to wall run, on the wall, and havent used last jump by jumping off a wall)
-	if can_wall_run and taken_jumps <= allowed_jumps and is_on_wall():
+	if wall_running():
 		# get wall vector
 		var wall_vectors: Array[Vector3] = [get_wall_normal()]
 
@@ -138,6 +139,8 @@ func _physics_process(delta):
 
 		# currently wall running state
 		is_wall_running = true
+
+	# no longer wall running
 	else: 
 		is_wall_running = false
 		wall_run_direction = 0
@@ -149,7 +152,7 @@ func _physics_process(delta):
 	move_and_slide()
 
 	# rotation
-	if is_wall_running:
+	if wall_running():
 		# rotate angle slightly if wall running
 		camera.rotation.z = lerp_angle(camera.rotation.z, deg_to_rad(-10 * wall_run_direction), delta * 5)
 
@@ -164,7 +167,7 @@ func _physics_process(delta):
 
 	# movement sound
 	sound_footsteps.stream_paused = true
-	if is_on_floor() or is_wall_running:
+	if is_on_floor() or wall_running():
 		if abs(velocity.x) > 1 or abs(velocity.z) > 1:
 			sound_footsteps.stream_paused = false
 
@@ -204,6 +207,17 @@ func handle_controls(_delta):
 
 	# movement
 	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
+	if wall_running():
+		movement_speed = clamp(movement_speed * 1.02, 1, base_speed)
+	elif input:
+		if is_on_wall() and is_on_floor() and movement_speed > 0:
+			movement_speed = 0
+		else:
+			movement_speed = clamp(movement_speed * 1.02, 1, base_speed)
+	elif is_on_floor():
+		movement_speed = clamp(movement_speed * 0.8, 0, base_speed)
+	elif is_on_wall():
+		movement_speed = 0
 	movement_velocity = Vector3(input.x, 0, input.y).normalized() * movement_speed
 
 	# rotation
@@ -254,7 +268,7 @@ func action_jump():
 	gravity = -jump_strength
 
 	# check if at max jumps
-	if taken_jumps >= allowed_jumps:
+	if taken_jumps >= max_jumps:
 		can_jump = false
 
 # shooting
@@ -367,3 +381,9 @@ func damage(amount):
 	# reset scene when out of health
 	if health < 0:
 		get_tree().reload_current_scene()
+
+func wall_running() -> bool:
+	if can_wall_run and taken_jumps <= max_jumps and is_on_wall():
+		return true
+	else:
+		return false

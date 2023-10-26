@@ -56,9 +56,6 @@ vertical_alignment = 2
 
 [node name="Player" parent="." node_paths=PackedStringArray("crosshair") instance=ExtResource("2_w4sc6")]
 crosshair = NodePath("../HUD/Crosshair")
-movement_speed = 10.0
-allowed_jumps = 1
-reset_jumps_on_wall_mount = true
 
 [node name="Level" type="Node" parent="."]
 
