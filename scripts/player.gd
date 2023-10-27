@@ -29,19 +29,15 @@ signal health_updated
 @export var weapon_change_sfx: AudioStream
 
 # internal properties
-var movement_speed: float = 0.0
-var weapon: Weapon
-var weapon_index: int = 0
-var mouse_sensitivity: int = 700
-var gamepad_sensitivity: float = 0.075
-var mouse_captured: bool = true
-var movement_velocity: Vector3
-var rotation_target: Vector3
-var input_mouse: Vector2
+var health: int = 100
+
 var container_offset = Vector3(1.2, -1.1, -2.75)
 var tween:Tween
-var health: int = 100
+var rotation_target: Vector3
+
 var gravity: float = 0.0
+var movement_velocity: Vector3
+var movement_speed: float = 0.0
 var previously_floored: bool = false
 var can_jump: bool = false
 var taken_jumps: int = 0
@@ -51,6 +47,14 @@ var wall_run_direction: int = 0
 var wall_run_rotation: float
 var rocket_jump_ground_max_distance: float = 2.0
 var rocket_jump_weapon_knockback_clamp: int = 8
+
+var mouse_sensitivity: int = 700
+var gamepad_sensitivity: float = 0.075
+var mouse_captured: bool = true
+var input_mouse: Vector2
+
+var weapon: Weapon
+var weapon_index: int = 0
 
 func _ready():
 	# set current mouse mode to captured
@@ -66,11 +70,132 @@ func _physics_process(delta):
 
 	# gravity
 	handle_gravity(delta)
+	
+	# movement
+	handle_movement(delta)
 
+# controls
+func handle_controls(_delta):
+	# mouse capture
+	if Input.is_action_just_pressed("mouse_capture"):
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		mouse_captured = true
+
+	# mouse exit
+	if Input.is_action_just_pressed("mouse_capture_exit"):
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		mouse_captured = false
+		input_mouse = Vector2.ZERO
+
+	# movement
+	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
+	if wall_running():
+		movement_speed = clamp(movement_speed * 1.02, 1, base_speed)
+	elif input:
+		if is_on_wall() and is_on_floor() and movement_speed > 0:
+			movement_speed = 0
+		else:
+			movement_speed = clamp(movement_speed * 1.02, 1, base_speed)
+	elif is_on_floor():
+		movement_speed = clamp(movement_speed * 0.8, 0, base_speed)
+	elif is_on_wall():
+		movement_speed = 0
+	movement_velocity = Vector3(input.x, 0, input.y).normalized() * movement_speed
+
+	# rotation
+	var rotation_input := Input.get_vector("camera_right", "camera_left", "camera_down", "camera_up")
+	rotation_target -= Vector3(-rotation_input.y, -rotation_input.x, 0).limit_length(1.0) * gamepad_sensitivity
+	rotation_target.x = clamp(rotation_target.x, deg_to_rad(-90), deg_to_rad(90))
+
+	# shooting
+	action_shoot()
+
+	# jumping
+	if Input.is_action_pressed("jump") and can_jump:
+		Audio.play(jump_sfx)
+		action_jump()
+
+	# weapon switching
+	action_weapon_toggle()
+
+# gravity
+func handle_gravity(delta):
+	gravity += 20 * delta
+
+	# reset on land
+	if gravity > 0 and is_on_floor():
+		# reset jump ability
+		taken_jumps = 0
+		can_jump = true
+
+		# reset wall run ability
+		can_wall_run = false
+
+		# reset gravity
+		gravity = 0
+
+	# prevent first jump if falling
+	if taken_jumps == 0 and not is_on_floor() and not is_wall_running:
+		can_jump = false
+
+# player movement
+func handle_movement(delta: float) -> void:
 	# calculate movement
 	var applied_velocity: Vector3
 	movement_velocity = transform.basis * movement_velocity
 
+	# wall running
+	handle_wall_running()
+
+	# apply movement
+	applied_velocity = velocity.lerp(movement_velocity, delta * 10)
+	applied_velocity.y = -gravity
+	velocity = applied_velocity
+	move_and_slide()
+
+	# rotation
+	if wall_running():
+		# slight camera z rotation as if player is hanging on the wall by their side
+		camera.rotation.z = lerp_angle(camera.rotation.z, deg_to_rad(-10 * wall_run_direction), delta * 5)
+
+		# clamp y rotation to the angle the player is wall running
+		rotation_target.y = clamp(rotation_target.y + TAU, (wall_run_rotation - PI/2) + TAU, (wall_run_rotation + PI/2) + TAU) - TAU
+	else:
+		# apply camera z rotation from player input smoothly
+		camera.rotation.z = lerp_angle(camera.rotation.z, -input_mouse.x * 25 * delta, delta * 5)
+
+	# apply y rotation
+	rotation.y = lerp_angle(rotation.y, rotation_target.y, delta * 25)
+
+	# apply camera x rotation from player input smoothly
+	camera.rotation.x = lerp_angle(camera.rotation.x, rotation_target.x, delta * 25)	
+
+	# lag viewport (weapon) behind player input for dramatic effect
+	container.position = lerp(container.position, container_offset - (basis.inverse() * applied_velocity / 30), delta * 10)
+
+	# movement sound
+	sound_footsteps.stream_paused = true
+	if is_on_floor() or wall_running():
+		if abs(velocity.x) > 1 or abs(velocity.z) > 1:
+			sound_footsteps.stream_paused = false
+
+	# correct camera position from its changed position due to falling/landing effect
+	camera.position.y = lerp(camera.position.y, 0.0, delta * 5)
+
+	# landed
+	if is_on_floor() and gravity > 1 and !previously_floored:
+		Audio.play(land_sfx)
+		camera.position.y = -0.1
+
+	# store landed state for next pass
+	previously_floored = is_on_floor()
+
+	# falling / respawning
+	if position.y < -10:
+		get_tree().reload_current_scene()
+
+# wall running
+func handle_wall_running() -> void:
 	# check if player has reached height of jump and can begin wall running
 	if can_wall_run == false and gravity > 0 and not is_on_floor():
 		can_wall_run = true
@@ -145,46 +270,12 @@ func _physics_process(delta):
 		is_wall_running = false
 		wall_run_direction = 0
 
-	# apply movement
-	applied_velocity = velocity.lerp(movement_velocity, delta * 10)
-	applied_velocity.y = -gravity
-	velocity = applied_velocity
-	move_and_slide()
-
-	# rotation
-	if wall_running():
-		# rotate angle slightly if wall running
-		camera.rotation.z = lerp_angle(camera.rotation.z, deg_to_rad(-10 * wall_run_direction), delta * 5)
-
-		# clamp y rotation of camera
-		rotation_target.y = clamp(rotation_target.y + TAU, (wall_run_rotation - PI/2) + TAU, (wall_run_rotation + PI/2) + TAU) - TAU
+# check if player is wall running
+func wall_running() -> bool:
+	if can_wall_run and taken_jumps <= max_jumps and is_on_wall():
+		return true
 	else:
-		# slightly tilt camera and lag behind mouse input for dramatic effect
-		camera.rotation.z = lerp_angle(camera.rotation.z, -input_mouse.x * 25 * delta, delta * 5)
-	rotation.y = lerp_angle(rotation.y, rotation_target.y, delta * 25)
-	camera.rotation.x = lerp_angle(camera.rotation.x, rotation_target.x, delta * 25)	
-	container.position = lerp(container.position, container_offset - (basis.inverse() * applied_velocity / 30), delta * 10)
-
-	# movement sound
-	sound_footsteps.stream_paused = true
-	if is_on_floor() or wall_running():
-		if abs(velocity.x) > 1 or abs(velocity.z) > 1:
-			sound_footsteps.stream_paused = false
-
-	# lerp camera to give sense of falling
-	camera.position.y = lerp(camera.position.y, 0.0, delta * 5)
-
-	# landed
-	if is_on_floor() and gravity > 1 and !previously_floored:
-		Audio.play(land_sfx)
-		camera.position.y = -0.1
-
-	# store landed state for next pass
-	previously_floored = is_on_floor()
-
-	# falling / respawning
-	if position.y < -10:
-		get_tree().reload_current_scene()
+		return false
 
 # mouse movement
 func _input(event):
@@ -192,69 +283,6 @@ func _input(event):
 		input_mouse = event.relative / mouse_sensitivity
 		rotation_target.y -= event.relative.x / mouse_sensitivity
 		rotation_target.x -= event.relative.y / mouse_sensitivity
-
-func handle_controls(_delta):
-	# mouse capture
-	if Input.is_action_just_pressed("mouse_capture"):
-		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-		mouse_captured = true
-
-	# mouse exit
-	if Input.is_action_just_pressed("mouse_capture_exit"):
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-		mouse_captured = false
-		input_mouse = Vector2.ZERO
-
-	# movement
-	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
-	if wall_running():
-		movement_speed = clamp(movement_speed * 1.02, 1, base_speed)
-	elif input:
-		if is_on_wall() and is_on_floor() and movement_speed > 0:
-			movement_speed = 0
-		else:
-			movement_speed = clamp(movement_speed * 1.02, 1, base_speed)
-	elif is_on_floor():
-		movement_speed = clamp(movement_speed * 0.8, 0, base_speed)
-	elif is_on_wall():
-		movement_speed = 0
-	movement_velocity = Vector3(input.x, 0, input.y).normalized() * movement_speed
-
-	# rotation
-	var rotation_input := Input.get_vector("camera_right", "camera_left", "camera_down", "camera_up")
-	rotation_target -= Vector3(-rotation_input.y, -rotation_input.x, 0).limit_length(1.0) * gamepad_sensitivity
-	rotation_target.x = clamp(rotation_target.x, deg_to_rad(-90), deg_to_rad(90))
-
-	# shooting
-	action_shoot()
-
-	# jumping
-	if Input.is_action_pressed("jump") and can_jump:
-		Audio.play(jump_sfx)
-		action_jump()
-
-	# weapon switching
-	action_weapon_toggle()
-
-# gravity
-func handle_gravity(delta):
-	gravity += 20 * delta
-
-	# reset on land
-	if gravity > 0 and is_on_floor():
-		# reset jump ability
-		taken_jumps = 0
-		can_jump = true
-
-		# reset wall run ability
-		can_wall_run = false
-
-		# reset gravity
-		gravity = 0
-
-	# prevent first jump if falling
-	if taken_jumps == 0 and not is_on_floor() and not is_wall_running:
-		can_jump = false
 
 # jumping
 func action_jump():
@@ -372,6 +400,7 @@ func change_weapon():
 	raycast.target_position = Vector3(0, 0, -1) * weapon.max_distance
 	crosshair.texture = weapon.crosshair
 
+# damage player
 func damage(amount):
 	health -= amount
 
@@ -381,9 +410,3 @@ func damage(amount):
 	# reset scene when out of health
 	if health < 0:
 		get_tree().reload_current_scene()
-
-func wall_running() -> bool:
-	if can_wall_run and taken_jumps <= max_jumps and is_on_wall():
-		return true
-	else:
-		return false
