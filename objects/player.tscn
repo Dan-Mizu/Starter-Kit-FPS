@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://dl2ed4gkybggf"]
+[gd_scene load_steps=18 format=3 uid="uid://dl2ed4gkybggf"]
 
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_iq1au"]
 [ext_resource type="Resource" uid="uid://cu2gtxlcmbb34" path="res://objects/weapons/blaster-repeater.tres" id="2_6epbw"]
@@ -11,6 +11,7 @@
 [ext_resource type="AudioStream" uid="uid://5raj3p7xaecq" path="res://assets/sounds/jump_b.ogg" id="6_7xwn8"]
 [ext_resource type="AudioStream" uid="uid://7tnsakv8pwa5" path="res://assets/sounds/jump_c.ogg" id="7_8js3r"]
 [ext_resource type="AudioStream" uid="uid://cmc2ufr6o30gl" path="res://assets/sounds/weapon_change.ogg" id="8_0yaao"]
+[ext_resource type="Shader" path="res://shaders/action_lines.gdshader" id="10_hju45"]
 
 [sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_sbk2y"]
 streams_count = 3
@@ -26,6 +27,24 @@ stream_2/weight = 1.0
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_gdq8c"]
 radius = 0.3
 height = 1.0
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_fhq3a"]
+frequency = 0.2695
+fractal_type = 0
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_qjc5e"]
+noise = SubResource("FastNoiseLite_fhq3a")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_iytjt"]
+shader = ExtResource("10_hju45")
+shader_parameter/line_color = Color(1, 1, 1, 1)
+shader_parameter/line_count = 1.2
+shader_parameter/line_density = 0.554
+shader_parameter/line_faloff = 0.792
+shader_parameter/mask_size = 0.299
+shader_parameter/mask_edge = 0.608
+shader_parameter/animation_speed = 16.0
+shader_parameter/noise = SubResource("NoiseTexture2D_qjc5e")
 
 [node name="Player" type="CharacterBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
@@ -79,6 +98,15 @@ frame = 2
 exclude_parent = false
 target_position = Vector3(0, 0, -10)
 collide_with_areas = true
+
+[node name="SpeedIndication" type="ColorRect" parent="Head/Camera"]
+visible = false
+material = SubResource("ShaderMaterial_iytjt")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="Shadow" type="Decal" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.9, 0)

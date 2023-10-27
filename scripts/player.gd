@@ -5,6 +5,7 @@ signal health_updated
 
 # references
 @onready var camera: Camera3D = $Head/Camera
+@onready var speed_indication: ColorRect = $Head/Camera/SpeedIndication
 @onready var raycast: RayCast3D = $Head/Camera/RayCast
 @onready var muzzle: AnimatedSprite3D = $Head/Camera/SubViewportContainer/SubViewport/CameraItem/Muzzle
 @onready var container: Node3D = $Head/Camera/SubViewportContainer/SubViewport/CameraItem/Container
@@ -38,6 +39,7 @@ var rotation_target: Vector3
 var gravity: float = 0.0
 var movement_velocity: Vector3
 var movement_speed: float = 0.0
+var incline_friction: float = 1.0
 var previously_floored: bool = false
 var can_jump: bool = false
 var taken_jumps: int = 0
@@ -75,7 +77,7 @@ func _physics_process(delta):
 	handle_movement(delta)
 
 # controls
-func handle_controls(_delta):
+func handle_controls(delta):
 	# mouse capture
 	if Input.is_action_just_pressed("mouse_capture"):
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -87,20 +89,29 @@ func handle_controls(_delta):
 		mouse_captured = false
 		input_mouse = Vector2.ZERO
 
-	# movement
+	# movement input
 	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
-	if wall_running():
-		movement_speed = clamp(movement_speed * 1.02, 1, base_speed)
-	elif input:
-		if is_on_wall() and is_on_floor() and movement_speed > 0:
-			movement_speed = 0
-		else:
-			movement_speed = clamp(movement_speed * 1.02, 1, base_speed)
-	elif is_on_floor():
-		movement_speed = clamp(movement_speed * 0.8, 0, base_speed)
-	elif is_on_wall():
-		movement_speed = 0
+	
+	# calculate momentum
+	var min_speed: float = 1.0
+	var move_rate: float = 1.05
+	if input and not wall_running(): # providing inputs while not wall running
+		if movement_speed > 1.0 and is_on_wall() and is_on_floor(): # collided with wall
+			min_speed = 0.0
+			move_rate = 0.0
+	elif is_on_floor(): # on floor, no provided inputs
+		min_speed = 0.8
+		move_rate = 0.0
+
+	# calculate movement speed and velocity
+	movement_speed = lerp(movement_speed, clamp(movement_speed * move_rate, min_speed, base_speed * incline_friction), delta * 25)
 	movement_velocity = Vector3(input.x, 0, input.y).normalized() * movement_speed
+
+	# speed indication
+	if movement_speed > base_speed:
+		speed_indication.visible = true
+	else:
+		speed_indication.visible = false
 
 	# rotation
 	var rotation_input := Input.get_vector("camera_right", "camera_left", "camera_down", "camera_up")
@@ -140,6 +151,14 @@ func handle_gravity(delta):
 
 # player movement
 func handle_movement(delta: float) -> void:
+	# get incline friction
+	if is_on_floor():
+		# get angle between floor and player's direction
+		var incline_angle = get_floor_normal().angle_to(-global_transform.basis.z)
+		incline_friction = 2.0 - round(rad_to_deg(incline_angle)) / 90
+	else:
+		incline_friction = 1.0
+
 	# calculate movement
 	var applied_velocity: Vector3
 	movement_velocity = transform.basis * movement_velocity
